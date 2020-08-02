@@ -14,10 +14,14 @@ docker-compose down
 
 # docker logs
 docker-compose logs -f
+```
 
-# twitter-test cli, refer to the project [README.md](https://github.com/danielhuang-030/twitter-test/blob/master/README.md) installation
+```shell
+# twitter-test cli
 docker exec -it twitter-test bash
 ```
+refer to the project [README.md](https://github.com/danielhuang-030/twitter-test/blob/master/README.md) installation
+
 
 ### Port
 | service  | port-inside | port-outside  | usage |
