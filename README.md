@@ -3,6 +3,15 @@
 ### Introduction
 Docker for [twitter-test](https://github.com/danielhuang-030/twitter-test)
 
+### Including
+ - [PHP 7.3 with FPM](https://hub.docker.com/_/php)
+ - [MySQL 5.7](https://hub.docker.com/_/mysql)
+ - [Redis](https://hub.docker.com/_/redis)
+ - [phpMyAdmin](https://hub.docker.com/r/phpmyadmin/phpmyadmin)
+ - [phpRedisAdmin](https://hub.docker.com/r/erikdubbelboer/phpredisadmin)
+ - [Laravel Echo Server](https://github.com/tlaverdure/laravel-echo-server)
+ - [Nginx](https://hub.docker.com/_/nginx)
+
 ### Usage
 
 ```shell
