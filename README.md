@@ -1,7 +1,7 @@
-# docker-twitter-test
+# docker-php
 
 ### Introduction
-Docker for [twitter-test](https://github.com/danielhuang-030/twitter-test)
+Docker for PHP
 
 ### Including
  - [PHP 7.3 with FPM](https://hub.docker.com/_/php)
@@ -25,29 +25,18 @@ docker-compose down
 docker-compose logs -f
 ```
 
-```shell
-# twitter-test cli
-docker exec -it twitter-test bash
-```
-refer to the project [README.md](https://github.com/danielhuang-030/twitter-test/blob/master/README.md) installation
-
-
 ### Port
-| service  | port-inside | port-outside  | usage |
+| service  | port-inside | port-outside  | description |
 |---|---|---|---|
-| web-server  | 12001, 12002 | 12001, 12002 | 12001: twitter-test, 12002: laravel-echo-server(WebSocket) | 
-| app-redis | 6379 | - | redis |
-| app-db | 3306, 33060 | 12006 | mysql |
-| laravel-echo-server | 6001 | - | WebSocket | 
-| twitter-test | 9000 | - | [twitter-test](https://github.com/danielhuang-030/twitter-test) |
-| app-pma | 80 | 12010 | phpMyAdmin |
-| app-pra | 80 | 12011 | phpRedisAdmin |
+| web-server  | 12001 | 12001 | 12001: [app](http://localhost:12001), [Laravel Echo Server(WebSocket)](http://localhost:12001/ws/) | 
+| app-redis | 6379 | - | Redis |
+| app-db | 3306, 33060 | 12006 | MySQL |
+| laravel-echo-server | 6001 | - | Laravel Echo Server(WebSocket) | 
+| app | 9000 | - | app |
+| app-pma | 80 | 12010 | [phpMyAdmin](http://localhost:12010) |
+| app-pra | 80 | 12011 | [phpRedisAdmin](http://localhost:12011) |
 
 ### Password
 | Service  | Username | Password  | 
 |---|---|---|
 | app-db | root | root |
-
-### Tools
-- [phpMyAdmin](http://localhost:12010)
-- [phpRedisAdmin](http://localhost:12011)

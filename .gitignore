@@ -1,11 +1,14 @@
-# Ignore folders
+/node_modules
+/public/storage
+/storage/*.key
+/vendor
+.env
+.phpunit.result.cache
+Homestead.json
+Homestead.yaml
+npm-debug.log
+yarn-error.log
 
-twitter-test/
-log/nginx/*
-log/laravel_echo_server/*
-data/mysql/*
-data/redis/*
-
-# others
-*.DS_Store
+_ide_helper.php
+.phpstorm.meta.php
 *.code-workspace

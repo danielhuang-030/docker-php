@@ -5,7 +5,7 @@ RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
 
 # Install app dependencies
-COPY ./conf/laravel-echo-server/package.json /usr/src/app/
+COPY ./dockerize/conf/laravel-echo-server/package.json /usr/src/app/
 
 RUN apk add --update \
     python \
@@ -16,7 +16,7 @@ RUN apk add --update \
 RUN npm install
 
 # Bundle app source
-COPY ./conf/laravel-echo-server/laravel-echo-server.json /usr/src/app/laravel-echo-server.json
+COPY ./dockerize/conf/laravel-echo-server/laravel-echo-server.json /usr/src/app/laravel-echo-server.json
 
 EXPOSE 6001
 CMD [ "npm", "start", "--force" ]

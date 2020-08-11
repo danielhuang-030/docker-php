@@ -1,0 +1,7 @@
+# Ignore folders
+log/nginx/*
+data/mysql/*
+data/redis/*
+
+# others
+*.DS_Store
