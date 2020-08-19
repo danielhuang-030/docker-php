@@ -19,6 +19,9 @@ RUN apk add --update --no-cache --virtual .imagick-runtime-deps imagemagick \
 # install redis
     && pecl install redis \
     && docker-php-ext-enable redis \
+# install swoole
+    && pecl install swoole \
+    && docker-php-ext-enable swoole \
 # clean up
     && apk del .build-deps \
     && rm -fr /tmp/pear
