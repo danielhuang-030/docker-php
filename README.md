@@ -28,7 +28,7 @@ docker-compose logs -f
 ### Port
 | service  | port-inside | port-outside  | description |
 |---|---|---|---|
-| web-server  | 12001 | 12001 | 12001: [app](http://localhost:12001), [Laravel Echo Server(WebSocket)](http://localhost:12001/ws/) | 
+| web-server  | 12001 | 12001 | [app](http://localhost:12001), [Laravel Echo Server(WebSocket)](http://localhost:12001/ws/) | 
 | app-redis | 6379 | - | Redis |
 | app-db | 3306, 33060 | 12006 | MySQL |
 | laravel-echo-server | 6001 | - | Laravel Echo Server(WebSocket) | 
