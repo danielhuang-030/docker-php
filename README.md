@@ -1,15 +1,15 @@
 # docker-php
 
 ### Introduction
-Docker for PHP
+Docker for PHP(Laravel)
 
 ### Including
- - [PHP 7.3 with FPM](https://hub.docker.com/_/php)
+ - [PHP 8.1 with FPM](https://hub.docker.com/_/php)
  - [MySQL 5.7](https://hub.docker.com/_/mysql)
  - [Redis](https://hub.docker.com/_/redis)
  - [phpMyAdmin](https://hub.docker.com/r/phpmyadmin/phpmyadmin)
  - [phpRedisAdmin](https://hub.docker.com/r/erikdubbelboer/phpredisadmin)
- - [Laravel Echo Server](https://github.com/tlaverdure/laravel-echo-server)
+ - [soketi](https://github.com/soketi/soketi)
  - [Nginx](https://hub.docker.com/_/nginx)
 
 ### Usage
@@ -28,15 +28,15 @@ docker-compose logs -f
 ### Port
 | service  | port-inside | port-outside  | description |
 |---|---|---|---|
-| web-server  | 12001 | 12001 | [app](http://localhost:12001), [Laravel Echo Server(WebSocket)](http://localhost:12001/ws/) | 
-| app-redis | 6379 | - | Redis |
-| app-db | 3306, 33060 | 12006 | MySQL |
-| laravel-echo-server | 6001 | - | Laravel Echo Server(WebSocket) | 
-| app | 9000 | - | app |
-| app-pma | 80 | 12010 | [phpMyAdmin](http://localhost:12010) |
-| app-pra | 80 | 12011 | [phpRedisAdmin](http://localhost:12011) |
+| php-web-server  | 80 | 35500 | [php-app](http://localhost:35500), [soketi(WebSocket)](http://localhost:35501) |
+| php-redis | 6379 | - | Redis |
+| php-db | 3306, 33060 | 35506 | MySQL |
+| soketi | 6001 | 35501 | soketi(WebSocket) |
+| php-app | 9000 | - | APP |
+| php-pma | 80 | 35510 | [phpMyAdmin](http://localhost:35510) |
+| php-pra | 80 | 35520 | [phpRedisAdmin](http://localhost:35520) |
 
 ### Password
-| Service  | Username | Password  | 
+| Service  | Username | Password  |
 |---|---|---|
-| app-db | root | root |
+| php-db | root | root |
