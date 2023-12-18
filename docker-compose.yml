@@ -1,15 +1,13 @@
 version: '3.7'
 
 networks:
-    php-network:
+    php-app-network:
         driver: bridge
 
 services:
-
-#php-db
-    php-db:
-        image: mysql:5.7
-        container_name: ${DB_HOST:-php-db}
+    php-app-db:
+        image: mysql:8.0
+        container_name: ${DB_HOST:-php-app-db}
         restart: always
         ports:
             - "${DB_PORT:-35506}:3306"
@@ -17,120 +15,97 @@ services:
             MYSQL_DATABASE: ${DB_DATABASE:-php}
             MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-root}
             TZ: ${TZ:-Asia/Taipei}
-        command: [
-            "--character-set-server=utf8mb4",
-            "--collation-server=utf8mb4_general_ci",
-            "--innodb-use-native-aio=0",
-            "--server-id=1",
-            "--log_bin=ON",
-            "--default-authentication-plugin=mysql_native_password"
-        ]
+        command: ["--default-authentication-plugin=mysql_native_password", "--character-set-server=utf8mb4", "--collation-server=utf8mb4_general_ci", "--log-bin", "--binlog-format=ROW"]
         volumes:
             - ./dockerize/data/mysql:/var/lib/mysql
         networks:
-            - php-network
+            - php-app-network
 
-#php-redis
-    php-redis:
-        build:
-            context: .
-            dockerfile: ./dockerize/dockerfile/redis.dockerfile
-        image: danielhuang-030/php-redis:0.0.1
-        container_name: ${REDIS_HOST:-php-redis}
+    php-app-redis:
+        image: redis:6
+        container_name: ${REDIS_HOST:-php-app-redis}
         restart: always
         ports:
             - "${REDIS_PORT:-35509}:6379"
         volumes:
             - ./dockerize/data/redis:/data
         networks:
-            - php-network
+            - php-app-network
 
-#phpMyAdmin
-    pma:
-        image: phpmyadmin/phpmyadmin:latest
-        container_name: php-pma
+    php-app-pma:
+        image: phpmyadmin/phpmyadmin:5.2
+        container_name: php-app-pma
         restart: always
         volumes:
-            - type: bind
-              source: ./dockerize/conf/phpMyAdmin/config.user.inc.php
-              target: /etc/phpmyadmin/config.user.inc.php
+            - ./dockerize/conf/phpMyAdmin/config.user.inc.php:/etc/phpmyadmin/config.user.inc.php
         ports:
             - "${PMA_PORT:-35510}:80"
         environment:
             SESSION_TIMEOUT: ${PMA_SESSION_TIMEOUT:-86400}
-            PMA_HOST: ${DB_HOST:-php-db}
+            PMA_HOST: ${DB_HOST:-php-app-db}
         networks:
-            - php-network
+            - php-app-network
         depends_on:
-            - ${DB_HOST:-php-db}
+            - php-app-db
 
-#phpRedisAdmin
-    pra:
-        image: erikdubbelboer/phpredisadmin:latest
-        container_name: php-pra
+    php-app-pra:
+        image: erikdubbelboer/phpredisadmin:1.19
+        container_name: php-app-pra
         restart: always
         ports:
             - "${PRA_PORT:-35520}:80"
         environment:
-            REDIS_1_HOST: ${REDIS_HOST:-php-redis}
-            REDIS_1_NAME: ${REDIS_HOST:-php-redis}
+            REDIS_1_HOST: ${REDIS_HOST:-php-app-redis}
+            REDIS_1_NAME: ${REDIS_HOST:-php-app-redis}
         networks:
-            - php-network
+            - php-app-network
         depends_on:
-            - ${REDIS_HOST:-php-redis}
+            - php-app-redis
 
-#php-app
     php-app:
         build:
             context: .
             dockerfile: ./dockerize/dockerfile/app.dockerfile
-        image: danielhuang-030/php-app:0.0.1
+            args:
+                REDIS_VERSION: ${REDIS_VERSION:-6.0.2}
+                SWOOLE_VERSION: ${SWOOLE_VERSION:-5.0.1}
         container_name: ${APP:-php-app}
         restart: always
         volumes:
             - ./app:/var/www/html/
-            - type: bind
-              source: ./dockerize/conf/supervisord/supervisord.conf
-              target: /etc/supervisord.conf
-            - type: bind
-              source: ./dockerize/conf/php/php.ini
-              target: /usr/local/etc/php/conf.d/php-custom.ini
-            - type: bind
-              source: ./dockerize/conf/cron/root
-              target: /etc/crontabs/root
+            - ./dockerize/conf/supervisord/supervisord.conf:/etc/supervisord.conf
+            - ./dockerize/conf/php/php.ini:/usr/local/etc/php/conf.d/php-custom.ini
+            - ./dockerize/conf/cron/root:/etc/crontabs/root
         networks:
-            - php-network
+            - php-app-network
         depends_on:
-            - php-db
-            - php-redis
-#php-soketi
-    php-soketi:
-        image: 'quay.io/soketi/soketi:latest-16-alpine'
-        container_name: php-soketi
+            - php-app-db
+            - php-app-redis
+
+    php-app-soketi:
+        image: quay.io/soketi/soketi:1.4-16-debian
+        container_name: php-app-soketi
         restart: always
         environment:
-            DEBUG: '1'
-            DEFAULT_APP_ID: ${SOKETI_APP_ID:-app-id}
-            DEFAULT_APP_KEY: ${SOKETI_APP_KEY:-app-key}
-            DEFAULT_APP_SECRET: ${SOKETI_APP_SECRET:-app-secret}
-            PORT: 6001
+            SOKETI_DEBUG: '1'
+            SOKETI_DEFAULT_APP_ID: ${SOKETI_APP_ID:-app-id}
+            SOKETI_DEFAULT_APP_KEY: ${SOKETI_APP_KEY:-app-key}
+            SOKETI_DEFAULT_APP_SECRET: ${SOKETI_APP_SECRET:-app-secret}
+            SOKETI_PORT: 6001
         ports:
             - '${SOKETI_PORT:-35501}:6001'
         networks:
-            - php-network
+            - php-app-network
 
-#php-web-server
-    php-web-server:
-        image: nginx:alpine
-        container_name: php-web-server
+    php-app-web-server:
+        image: nginx:1.25-alpine
+        container_name: php-app-web-server
         restart: always
         volumes:
             - ./app:/var/www/html/
             - ./dockerize/log/nginx/:/var/log/nginx/
-            - type: bind
-              source: ./dockerize/conf/nginx/default.conf
-              target: /etc/nginx/conf.d/default.conf
+            - ./dockerize/conf/nginx/default.conf:/etc/nginx/conf.d/default.conf
         ports:
             - "${WEB_PORT:-35500}:80"
         networks:
-            - php-network
+            - php-app-network
