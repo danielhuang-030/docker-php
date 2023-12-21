@@ -68,7 +68,7 @@ services:
             dockerfile: ./dockerize/dockerfile/app.dockerfile
             args:
                 REDIS_VERSION: ${REDIS_VERSION:-6.0.2}
-                SWOOLE_VERSION: ${SWOOLE_VERSION:-5.0.1}
+                SWOOLE_VERSION: ${SWOOLE_VERSION:-5.1.0}
         container_name: ${APP:-php-app}
         restart: always
         volumes:
