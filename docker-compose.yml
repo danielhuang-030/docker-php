@@ -6,9 +6,9 @@ networks:
 
 services:
     php-app-db:
-        image: mysql:8.0
+        image: mysql:8.4
         container_name: ${DB_HOST:-php-app-db}
-        restart: always
+        restart: unless-stopped
         ports:
             - "${DB_PORT:-35506}:3306"
         environment:
@@ -22,9 +22,9 @@ services:
             - php-app-network
 
     php-app-redis:
-        image: redis:6
+        image: redis:6.0.20
         container_name: ${REDIS_HOST:-php-app-redis}
-        restart: always
+        restart: unless-stopped
         ports:
             - "${REDIS_PORT:-35509}:6379"
         volumes:
@@ -35,7 +35,7 @@ services:
     php-app-pma:
         image: phpmyadmin/phpmyadmin:5.2
         container_name: php-app-pma
-        restart: always
+        restart: unless-stopped
         volumes:
             - ./dockerize/conf/phpMyAdmin/config.user.inc.php:/etc/phpmyadmin/config.user.inc.php
         ports:
@@ -43,24 +43,24 @@ services:
         environment:
             SESSION_TIMEOUT: ${PMA_SESSION_TIMEOUT:-86400}
             PMA_HOST: ${DB_HOST:-php-app-db}
+            TZ: ${TZ:-Asia/Taipei}
         networks:
             - php-app-network
         depends_on:
             - php-app-db
 
-    php-app-pra:
-        image: erikdubbelboer/phpredisadmin:1.19
-        container_name: php-app-pra
-        restart: always
+    php-app-ri:
+        image: redislabs/redisinsight:v2
+        container_name: php-app-ri
+        restart: unless-stopped
         ports:
-            - "${PRA_PORT:-35520}:80"
-        environment:
-            REDIS_1_HOST: ${REDIS_HOST:-php-app-redis}
-            REDIS_1_NAME: ${REDIS_HOST:-php-app-redis}
+            - "${RI_PORT:-35520}:5540"
+        volumes:
+            - ./data/redis_insight:/db
         networks:
             - php-app-network
         depends_on:
-            - php-app-redis
+            - ${REDIS_HOST:-php-app-redis}
 
     php-app:
         build:
@@ -68,9 +68,11 @@ services:
             dockerfile: ./dockerize/dockerfile/app.dockerfile
             args:
                 REDIS_VERSION: ${REDIS_VERSION:-6.0.2}
-                SWOOLE_VERSION: ${SWOOLE_VERSION:-5.1.0}
+                SWOOLE_VERSION: ${SWOOLE_VERSION:-5.1.2}
+                TZ: ${TZ:-Asia/Taipei}
+        image: danielhuang030/php-app:0.0.1
         container_name: ${APP:-php-app}
-        restart: always
+        restart: unless-stopped
         volumes:
             - ./app:/var/www/html/
             - ./dockerize/conf/supervisord/supervisord.conf:/etc/supervisord.conf
@@ -79,28 +81,13 @@ services:
         networks:
             - php-app-network
         depends_on:
-            - php-app-db
-            - php-app-redis
-
-    php-app-soketi:
-        image: quay.io/soketi/soketi:1.4-16-debian
-        container_name: php-app-soketi
-        restart: always
-        environment:
-            SOKETI_DEBUG: '1'
-            SOKETI_DEFAULT_APP_ID: ${SOKETI_APP_ID:-app-id}
-            SOKETI_DEFAULT_APP_KEY: ${SOKETI_APP_KEY:-app-key}
-            SOKETI_DEFAULT_APP_SECRET: ${SOKETI_APP_SECRET:-app-secret}
-            SOKETI_PORT: 6001
-        ports:
-            - '${SOKETI_PORT:-35501}:6001'
-        networks:
-            - php-app-network
+            - ${DB_HOST:-php-app-db}
+            - ${REDIS_HOST:-php-app-redis}
 
     php-app-web-server:
         image: nginx:1.25-alpine
         container_name: php-app-web-server
-        restart: always
+        restart: unless-stopped
         volumes:
             - ./app:/var/www/html/
             - ./dockerize/log/nginx/:/var/log/nginx/
