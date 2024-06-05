@@ -15,7 +15,7 @@ services:
             MYSQL_DATABASE: ${DB_DATABASE:-php}
             MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-root}
             TZ: ${TZ:-Asia/Taipei}
-        command: ["--default-authentication-plugin=mysql_native_password", "--character-set-server=utf8mb4", "--collation-server=utf8mb4_general_ci", "--log-bin", "--binlog-format=ROW"]
+        command: ["--character-set-server=utf8mb4", "--collation-server=utf8mb4_unicode_ci", "--log-bin", "--binlog-format=ROW"]
         volumes:
             - ./dockerize/data/mysql:/var/lib/mysql
         networks:
@@ -56,7 +56,7 @@ services:
         ports:
             - "${RI_PORT:-35520}:5540"
         volumes:
-            - ./data/redis_insight:/db
+            - ./data/redis_insight:/data
         networks:
             - php-app-network
         depends_on:
