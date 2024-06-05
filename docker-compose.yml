@@ -56,7 +56,7 @@ services:
         ports:
             - "${RI_PORT:-35520}:5540"
         volumes:
-            - ./data/redis_insight:/data
+            - ./dockerize/data/redis_insight:/data
         networks:
             - php-app-network
         depends_on:
