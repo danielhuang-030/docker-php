@@ -61,6 +61,7 @@ services:
             - php-app-network
         depends_on:
             - ${REDIS_HOST:-php-app-redis}
+        user: "0:0"
 
     php-app:
         build:
