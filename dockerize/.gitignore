@@ -4,7 +4,6 @@ data/*
 !/data/mysql/.gitignore
 !/data/redis/.gitignore
 !/data/redis_insight/.gitignore
-!/data/redis_insight/logs/.gitignore
 
 # others
 *.DS_Store
